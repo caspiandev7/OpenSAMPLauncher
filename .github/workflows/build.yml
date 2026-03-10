@@ -1,0 +1,44 @@
+name: Build SAMP Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # GitHub səhifəsindən manual başlatmaq üçün
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repozitoriyanı yüklə (Checkout)
+        uses: actions/checkout@v4
+        with:
+          # SA-MP layihələrində C++ kitabxanaları adətən alt-modul kimi gəlir
+          submodules: recursive 
+
+      - name: Java JDK quraşdır
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17' # Əgər layihə köhnədirsə, bunu '11' edə bilərsiniz
+
+      - name: Gradle Cache qur (Sürətli build üçün)
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: gradlew üçün icra icazəsi ver
+        run: chmod +x ./gradlew
+
+      - name: Debug APK-nı Build et
+        # Bu komanda NDK və SDK-nı istifadə edərək proqramı yığır
+        run: ./gradlew assembleDebug
+
+      - name: Hazır APK faylını yüklə (Artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: SAMP-Client-APK
+          # DİQQƏT: 'app' qovluğunun adı layihənizdə 'client' və ya başqa cür ola bilər.
+          # Əgər APK tapılmasa, bu yolu layihənizə uyğunlaşdırın.
+          path: app/build/outputs/apk/debug/*.apk
