@@ -1,35 +1,38 @@
-name: Android CI (APK Build)
+name: Build Android APK
 
 on:
-  push:
-    branches: [ "master" ] 
-
-  pull_request:
-    branches: [ "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Kodu kopyala
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Java (JDK 17) quraşdır
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Gradle-ə icazə ver
-      run: chmod +x gradlew
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '11'
 
-    - name: APK-nı hazırla (Build)
-      run: ./gradlew assembleDebug
+      - name: Install Dependencies
+        run: yarn install
 
-    - name: Hazır APK-nı GitHub-a yüklə (Upload Artifact)
-      uses: actions/upload-artifact@v4
-      with:
-        name: samp-launcher-debug-apk
-        path: app/build/outputs/apk/debug/*.apk
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SAMP-Launcher-APK
+          path: android/app/build/outputs/apk/debug/*.apk
