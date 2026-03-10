@@ -1,0 +1,34 @@
+name: Android CI (APK Build)
+
+on:
+  push:
+    branches: [ "main" ] # Əgər budaq adı master-dirsə, master yazın
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Kodu kopyala
+      uses: actions/checkout@v4
+
+    - name: Java (JDK 17) quraşdır
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Gradle-ə icazə ver
+      run: chmod +x gradlew
+
+    - name: APK-nı hazırla (Build)
+      run: ./gradlew assembleDebug
+
+    - name: Hazır APK-nı GitHub-a yüklə (Upload Artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: samp-launcher-debug-apk
+        path: app/build/outputs/apk/debug/*.apk
