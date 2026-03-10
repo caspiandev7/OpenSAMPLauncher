@@ -14,10 +14,10 @@ jobs:
     - name: Kodu kopyala
       uses: actions/checkout@v4
 
-    - name: Java (JDK 17) quraşdır
+    - name: Java (JDK 11) quraşdır
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '11'
         distribution: 'temurin'
         cache: gradle
 
