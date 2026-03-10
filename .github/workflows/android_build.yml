@@ -2,9 +2,10 @@ name: Android CI (APK Build)
 
 on:
   push:
-    branches: [ "main" ] # Əgər budaq adı master-dirsə, master yazın
+    branches: [ "master" ] 
+
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   build:
