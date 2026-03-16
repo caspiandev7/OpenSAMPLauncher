@@ -1,40 +1,33 @@
-name: Build SAMP Android APK
+name: Build SAMP Client
 
 on:
-  push:
-    branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repozitoriyanı yüklə (Checkout)
+      - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive 
 
-      - name: Java JDK quraşdır
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '8' # Köhnə Gradle (6.5) üçün ən stabil versiya budur
+          # Əksər yeni Android proyektləri Java 17 tələb edir. 
+          # Əgər xəta versə, bunu '11' edərsən.
+          java-version: '17' 
 
-      - name: Gradle Cache qur
-        uses: gradle/actions/setup-gradle@v3
+      - name: Build APK
+        run: |
+          # Qovluğa girməyə ehtiyac yoxdur, çünki gradlew ana qovluqdadır
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
 
-      - name: gradlew üçün icra icazəsi ver
-        run: chmod +x ./gradlew
-
-      - name: Debug APK-nı Build et
-        run: ./gradlew assembleDebug
-
-      - name: Hazır APK faylını yüklə (Artifact)
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: SAMP-Client-APK
-          path: app/build/outputs/apk/debug/*.apk
+          # APK birbaşa app qovluğunun içindən götürüləcək
+          path: app/build/outputs/apk/**/*.apk
